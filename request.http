@@ -1,0 +1,36 @@
+@baseUrl = https://dev.gremiodelaindustriagrafica.com
+# @baseUrl = http://localhost:3000
+
+
+### Ping
+GET {{baseUrl}}/ping
+
+### Health
+GET {{baseUrl}}/health
+
+### DB Ping
+GET {{baseUrl}}/db-ping
+
+### Subir un archivo
+POST {{baseUrl}}/upload
+Content-Type: multipart/form-data; boundary=----boundary
+
+------boundary
+Content-Disposition: form-data; name="file"; filename="imagen.jpg"
+Content-Type: image/jpeg
+
+< ./imagen.jpg
+------boundary--
+
+### Listar archivos
+GET {{baseUrl}}/files
+
+
+
+@fileKey = 1786850906003-imagen.jpg
+
+### Obtener URL firmada de un archivo
+GET {{baseUrl}}/files/{{fileKey}}/url
+
+### Eliminar un archivo
+DELETE {{baseUrl}}/files/{{fileKey}}

@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    container_name: transpaservic
+    network_mode: "host"   # necesario: mariadb y cloudflared en la EC2 tambien usan --network host,
+                            # asi el contenedor ve 127.0.0.1 igual que el resto del stack
+    # ports:                # con network_mode host, "ports" no aplica (el contenedor ya usa
+    #   - "3000:3000"       # los puertos del host directamente) - lo dejamos comentado como referencia
+    env_file:
+      - .env
+    volumes:
+      - ./uploads:/app/uploads
+      - ./backups:/app/backups
+    restart: unless-stopped

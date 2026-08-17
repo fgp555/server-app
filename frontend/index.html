@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Sitio con PicoCSS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      main {
+        flex: 1;
+      }
+
+      #toggleThemeBtn {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        font-size: 1.2rem;
+        padding: 0.6rem 0.9rem;
+      }
+
+      header,
+      footer {
+        padding: 1rem 0;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--muted-color);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="container">
+      <nav>
+        <ul>
+          <li><strong>MiApp</strong></li>
+        </ul>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Acerca</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </nav>
+      <hr />
+    </header>
+
+    <main class="container">
+      <h1>Bienvenido a Mi Sitio</h1>
+      <p>Este es un layout base utilizando PicoCSS con detección automática de tema y botón flotante para cambiarlo.</p>
+    </main>
+
+    <footer class="container">
+      <p>&copy; 2025 MiEmpresa. Todos los derechos reservados.</p>
+    </footer>
+
+    <button id="toggleThemeBtn" class="contrast" aria-label="Cambiar tema">
+      <i id="themeIcon" class="fas fa-moon"></i>
+    </button>
+
+    <script>
+      const toggleBtn = document.getElementById("toggleThemeBtn");
+      const themeIcon = document.getElementById("themeIcon");
+      const root = document.documentElement;
+
+      function setTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        updateIcon(theme);
+      }
+
+      function updateIcon(theme) {
+        if (theme === "dark") {
+          themeIcon.classList.remove("fa-sun");
+          themeIcon.classList.add("fa-moon");
+        } else {
+          themeIcon.classList.remove("fa-moon");
+          themeIcon.classList.add("fa-sun");
+        }
+      }
+
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const savedTheme = localStorage.getItem("theme");
+      const initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
+      setTheme(initialTheme);
+
+      toggleBtn.addEventListener("click", () => {
+        const currentTheme = root.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        setTheme(newTheme);
+      });
+    </script>
+  </body>
+</html>
