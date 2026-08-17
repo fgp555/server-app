@@ -17,5 +17,6 @@ build
 _credentials
 backups
 uploads
+images
 temp
 tmp

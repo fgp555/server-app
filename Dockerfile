@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /transpaservic-dist
 
 # Instalar dependencias de producción
 COPY package*.json ./
