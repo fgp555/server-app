@@ -5,11 +5,14 @@
 ### Ping
 GET {{baseUrl}}/ping
 
+
 ### Health
 GET {{baseUrl}}/health
 
+
 ### DB Ping
 GET {{baseUrl}}/db-ping
+
 
 ### Subir un archivo
 POST {{baseUrl}}/upload
@@ -22,15 +25,38 @@ Content-Type: image/jpeg
 < ./imagen.jpg
 ------boundary--
 
+
 ### Listar archivos
 GET {{baseUrl}}/files
 
 
-
 @fileKey = 1786850906003-imagen.jpg
+
 
 ### Obtener URL firmada de un archivo
 GET {{baseUrl}}/files/{{fileKey}}/url
 
+
 ### Eliminar un archivo
 DELETE {{baseUrl}}/files/{{fileKey}}
+
+
+### Enviar email al destinatario configurado en SMTP_TO_ADMIN
+POST {{baseUrl}}/send-email
+Content-Type: application/json
+
+{
+  "subject": "Prueba desde Transpaservic",
+  "message": "Este es un mensaje de prueba enviado desde el servicio Transpaservic."
+}
+
+
+### Enviar email a un destinatario específico
+POST {{baseUrl}}/send-email
+Content-Type: application/json
+
+{
+  "to": "fgp555@gmail.com",
+  "subject": "Prueba de correo",
+  "message": "Este correo fue enviado utilizando el endpoint /send-email."
+}

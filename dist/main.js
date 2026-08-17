@@ -10,12 +10,14 @@ const {
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(morgan("dev"));
 app.use(express.static("./frontend/"));
+app.use(express.json());
 
 console.log("test:", process.env.TEST_ENV);
 
@@ -41,6 +43,18 @@ const s3 = new S3Client({ region: process.env.AWS_REGION || "us-east-2" });
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+});
+
+// --- Transporte SMTP para envio de correos ---
+const smtpPort = Number(process.env.SMTP_PORT) || 465;
+const smtpTransporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: smtpPort,
+  secure: smtpPort === 465, // true para 465 (SSL), false para 587 (STARTTLS)
+  auth: {
+    user: process.env.SMTP_USER || process.env.SMTP_FROM,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 app.get("/ping", (req, res) => {
@@ -120,6 +134,36 @@ app.delete("/files/:key", async (req, res) => {
     res.status(200).json({ status: "ok", deleted: req.params.key });
   } catch (err) {
     console.error("Error eliminando de S3:", err.message);
+    res.status(500).json({ status: "error", message: err.message });
+  }
+});
+
+// --- Enviar un correo: POST /send-email { to?, subject?, message } ---
+// "to" es opcional: si no se envia, cae a SMTP_TO_ADMIN
+app.post("/send-email", async (req, res) => {
+  const { to, subject, message } = req.body || {};
+
+  if (!message) {
+    return res.status(400).json({ status: "error", message: "Falta 'message' en el body" });
+  }
+
+  const destinatario = to || process.env.SMTP_TO_ADMIN;
+  if (!destinatario) {
+    return res
+      .status(500)
+      .json({ status: "error", message: "No hay destinatario: falta 'to' en el body y SMTP_TO_ADMIN no esta configurada" });
+  }
+
+  try {
+    await smtpTransporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to: destinatario,
+      subject: subject || "Nuevo mensaje desde Transpaservic",
+      text: message,
+    });
+    res.status(200).json({ status: "ok" });
+  } catch (err) {
+    console.error("Error enviando email:", err.message);
     res.status(500).json({ status: "error", message: err.message });
   }
 });
